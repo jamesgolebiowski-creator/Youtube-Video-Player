@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Youtube Video Player</title>
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,
+  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'>
+    <text x='8' y='12' font-size='14' text-anchor='middle' fill='%237c3aed'
+    font-family='Arial Rounded MT Bold, Arial'>▶︎</text>
+  </svg>">
+
+  <style>
+    :root {
+      --bg: #f5f7fa;
+      --card-bg: #ffffff;
+      --accent: #4f46e5;
+      --accent-hover: #4338ca;
+      --text: #1f2937;
+      --radius: 14px;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: "Inter", sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+      color: var(--text);
+    }
+
+    .card {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 650px;
+      padding: 32px;
+      border-radius: var(--radius);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      border-radius: var(--radius);
+      border: 1px solid #d1d5db;
+      outline: none;
+      transition: 0.2s;
+      margin-top: 12px;
+      margin-left: -6px;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79,70,229,0.2);
+    }
+
+    button {
+      margin-top: 14px;
+      padding: 14px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+      font-weight: 600;
+    }
+
+    button:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 4px 14px rgba(79,70,229,0.3);
+    }
+
+    #video-container {
+      margin-top: 28px;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #000;
+    }
+
+    #video-container iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    * {
+      user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>Youtube Video Player</h1>
+
+    <label for="youtube-url">Paste YouTube URL</label>
+    <input type="text" id="youtube-url" placeholder="https://www.youtube.com/watch?v=VIDEO_ID" />
+
+    <button onclick="embedVideo()">Play Video</button>
+
+    <div id="video-container"></div>
+  </div>
+
+  <script>
+    function extractVideoId(url) {
+      try {
+        const parsed = new URL(url);
+
+        if (parsed.hostname.includes("youtube.com")) {
+          return parsed.searchParams.get("v");
+        }
+
+        if (parsed.hostname === "youtu.be") {
+          return parsed.pathname.slice(1);
+        }
+      } catch {
+        return null;
+      }
+      return null;
+    }
+
+    function embedVideo() {
+      const urlInput = document.getElementById("youtube-url").value.trim();
+      const videoId = extractVideoId(urlInput);
+      const container = document.getElementById("video-container");
+
+      if (!videoId) {
+        return; // do nothing on invalid URL
+      }
+
+      const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+
+      container.innerHTML = `
+        <iframe
+          src="${embedUrl}"
+          title="YouTube video player"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+        </iframe>
+      `;
+    }
+
+    // Play video when pressing Enter
+    document.getElementById("youtube-url").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        embedVideo();
+      }
+    });
+
+    document.addEventListener("contextmenu", e => e.preventDefault());
+    document.addEventListener("selectstart", e => e.preventDefault());
+    document.addEventListener("dragstart", e => e.preventDefault());
+
+    document.addEventListener("touchstart", function (event) {
+      if (event.touches.length > 1) event.preventDefault();
+    }, { passive: false });
+
+    document.addEventListener("gesturestart", e => e.preventDefault());
+  </script>
+</body>
+</html>
